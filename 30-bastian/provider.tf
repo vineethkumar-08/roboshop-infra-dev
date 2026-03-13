@@ -8,7 +8,7 @@ terraform {
   
   backend "s3" {
     bucket         = "remote-state-vineeth-demo"
-    key            = "roboshop-dev-sg"
+    key            = "roboshop-dev-bastian"
     region         = "us-east-1"
     dynamodb_table = "your-dynamodb-lock-table"
     encrypt        = true
