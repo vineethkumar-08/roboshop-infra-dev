@@ -1,0 +1,23 @@
+bastian:
+- name: bastian_internet #bastian accepting connection from internet/ip address
+  port: 22
+  src: internet
+  dest: bastian
+
+mongobd: 
+
+- name: mongodb_bastian #mongodb accepting connections from Bastian
+  port: 22
+  src: bastian
+  dest: mongodb
+
+
+- name: mongodb_catalogue #mongodb accepting connections form catalogue
+  port: 27017
+  src: catalogue
+  dest: mongodb 
+
+- name: mongobd_user # mongodb accepting connection from user
+  port: 27017
+  src: user
+  dest: mongobd
