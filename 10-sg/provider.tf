@@ -10,7 +10,6 @@ terraform {
     bucket         = "remote-state-vineeth-demo"
     key            = "roboshop-dev-sg"
     region         = "us-east-1"
-    dynamodb_table = "your-dynamodb-lock-table"
     encrypt        = true
     use_lockfile = true
   }
