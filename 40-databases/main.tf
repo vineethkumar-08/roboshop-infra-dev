@@ -1,43 +1,77 @@
 resource "aws_instance" "mongodb" {
-  ami                    = local.ami_id
-  instance_type          = "t3.micro"
-  subnet_id              = local.mongodb_subnet_id
+  ami           = local.ami_id
+  instance_type = "t3.micro"
+  subnet_id = local.database_subnet_id
   vpc_security_group_ids = [local.mongodb_sg_id]
-  #   iam_instance_profile = aws_iam_instance_profile.mongodb.name
 
   tags = merge(
     {
-      Name = "${var.project}-${var.environment}-mongodb"
+        Name = "${var.project}-${var.environment}-mongodb"
     },
     local.common_tags
   )
 }
 
-
-resource "terraform_data" "bootstrap" {
+resource "terraform_data" "mongodb" {
   triggers_replace = [
-    aws_instance.mongodb.id,
+    aws_instance.mongodb.id
   ]
+
   connection {
-    type             = "ssh"
-    user             = "ec2-user"
-    password         = "DevOps321"
-    host             = aws_instance.mongodb.private_ip
-    bastion_host     = data.aws_instance.bastion.public_ip
-    bastion_user     = "ec2-user"
-    bastion_password = "DevOps321"
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.mongodb.private_ip
   }
 
   provisioner "file" {
-    source      = "bootstrap.sh"      # local file path in our database file
-    destination = "/tmp/bootstrap.sh" # destination path on the remote machhine/copying tmp.boothstrap.sh
+    source      = "bootstrap.sh" # Local file path
+    destination = "/tmp/bootstrap.sh"    # Destination path on the remote machine
   }
-
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/bootstrap.sh",
-      "sudo sh /tmp/bootstrap.sh mongodb ${var.environment}"
+        "chmod +x /tmp/bootstrap.sh",
+        "sudo sh /tmp/bootstrap.sh mongodb ${var.environment}"
+    ]
+  }
+}
+
+resource "aws_instance" "redis" {
+  ami           = local.ami_id
+  instance_type = "t3.micro"
+  subnet_id = local.database_subnet_id
+  vpc_security_group_ids = [local.redis_sg_id]
+
+  tags = merge(
+    {
+        Name = "${var.project}-${var.environment}-redis"
+    },
+    local.common_tags
+  )
+}
+
+resource "terraform_data" "bootstrap_redis" {
+  triggers_replace = [
+    aws_instance.redis.id
+  ]
+
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.redis.private_ip
+  }
+
+  provisioner "file" {
+    source      = "bootstrap.sh" # Local file path
+    destination = "/tmp/bootstrap.sh"    # Destination path on the remote machine
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+        "chmod +x /tmp/bootstrap.sh",
+        "sudo sh /tmp/bootstrap.sh redis ${var.environment}"
     ]
   }
 }
