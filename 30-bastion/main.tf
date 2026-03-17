@@ -1,13 +1,25 @@
 resource "aws_instance" "bastian" {
-  ami           = local.ami_id
-  instance_type = "t3.micro"
-  subnet_id = local.public_subnet_id
+  ami                    = local.ami_id
+  instance_type          = "t3.micro"
+  subnet_id              = local.public_subnet_id
   vpc_security_group_ids = [local.bastion_sg_id]
-  iam_instance_profile = aws_iam_instance_profile.bastion.name
+  iam_instance_profile   = aws_iam_instance_profile.bastion.name
+  #user_data = file("bastion. sh")
+  root_block_device {
+    volume_size = 90
+    volume_type = "gp3"
+    #EBS volume tags
+    tags = merge(
+      {
+        Name = "${var.project}-${var.environment}-bastion"
+      },
+      local.common_tags
+    )
+  }
 
   tags = merge(
     {
-        Name = "${var.project}-${var.environment}-bastion"
+      Name = "${var.project}-${var.environment}-bastion"
     },
     local.common_tags
   )
@@ -32,17 +44,16 @@ resource "aws_iam_role" "bastion" {
     ]
   })
 
- tags = merge(
+  tags = merge(
     {
-        Name = "RoboshopDevBastion"
+      Name = "RoboshopDevBastion"
     },
     local.common_tags
-  ) 
+  )
 }
 
-resource "aws_iam_policy_attachment" "bastion" {
-  name       = "${var.project}/${var.environment}-bastion"
-  roles      = [aws_iam_role.bastion.name]
+resource "aws_iam_role_policy_attachment" "bastion_admin" {
+  role       = aws_iam_role.bastion.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 

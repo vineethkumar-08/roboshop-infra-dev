@@ -5,12 +5,12 @@ terraform {
       version = "6.33.0" # terrafomr aws provider version
     }
   }
-  
+
   backend "s3" {
-    bucket         = "remote-state-vineeth-demo"
-    key            = "roboshop-dev-bastian"
-    region         = "us-east-1"
-    encrypt        = true
+    bucket       = "remote-state-vineeth-demo"
+    key          = "roboshop-dev-bastion"
+    region       = "us-east-1"
+    encrypt      = true
     use_lockfile = true
   }
 }
