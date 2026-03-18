@@ -76,7 +76,6 @@ resource "terraform_data" "bootstrap_redis" {
   }
 }
 
-
 resource "aws_instance" "mysql" {
   ami           = local.ami_id
   instance_type = "t3.micro"
@@ -92,7 +91,7 @@ resource "aws_instance" "mysql" {
   )
 }
 
-resource "terraform_data" "bootstrap_mysql" {
+resource "terraform_data" "mysql" {
   triggers_replace = [
     aws_instance.mysql.id
   ]
@@ -117,14 +116,12 @@ resource "terraform_data" "bootstrap_mysql" {
   }
 }
 
-
-
-
 resource "aws_instance" "rabbitmq" {
   ami           = local.ami_id
   instance_type = "t3.micro"
   subnet_id = local.database_subnet_id
   vpc_security_group_ids = [local.rabbitmq_sg_id]
+
   tags = merge(
     {
         Name = "${var.project}-${var.environment}-rabbitmq"
@@ -133,7 +130,7 @@ resource "aws_instance" "rabbitmq" {
   )
 }
 
-resource "terraform_data" "bootstrap_rabbitmq" {
+resource "terraform_data" "rabbitmq" {
   triggers_replace = [
     aws_instance.rabbitmq.id
   ]
@@ -157,6 +154,3 @@ resource "terraform_data" "bootstrap_rabbitmq" {
     ]
   }
 }
-
- 
-
