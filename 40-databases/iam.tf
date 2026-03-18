@@ -42,8 +42,3 @@ resource "aws_iam_instance_profile" "mysql" {
   name = "${var.project}-${var.environment}-mysql"
   role = aws_iam_role.mysql.name
 }
-
-resource "aws_iam_instance_profile" "rabbitmq" {
-  name = "${var.project}-${var.environment}-rabbitmq"
-  role = aws_iam_role.rabbitmq.name
-}
