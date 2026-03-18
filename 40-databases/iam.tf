@@ -17,7 +17,7 @@ resource "aws_iam_role" "mysql" {
     ]
   })
 
-  tags = merg ({
+  tags = merge ({
         Name = local.mysql_role_name
 
   },
