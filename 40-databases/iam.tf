@@ -24,3 +24,9 @@ resource "aws_iam_role" "mysql" {
   local.common_tags 
   )
 }
+
+resource "aws_iam_policy" "mysql" {
+  name        = "test_policy"
+  description = "policy for mysql instance "
+  policy      = file("mysql-iam-policy.json") 
+  }
