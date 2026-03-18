@@ -25,6 +25,11 @@ resource "aws_instance" "bastion" {
     local.common_tags
   )
 }
+resource "aws_ssm_parameter" "bastion_ip" {
+  name  = "/roboshop/${var.environment}/bastion_ip"
+  type  = "String"
+  value = aws_instance.bastion.public_ip
+}
 
 resource "aws_iam_role" "bastion" {
   name = "RoboShopDevBastion"
