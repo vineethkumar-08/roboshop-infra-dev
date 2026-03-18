@@ -82,6 +82,7 @@ resource "aws_instance" "mysql" {
   instance_type = "t3.micro"
   subnet_id = local.database_subnet_id
   vpc_security_group_ids = [local.mysql_sg_id]
+  iam_instance_profile = aws_iam_instance_profile.mysql.name
 
   tags = merge(
     {
@@ -114,4 +115,9 @@ resource "terraform_data" "bootstrap_mysql" {
         "sudo sh /tmp/bootstrap.sh mysql ${var.environment}"
     ]
   }
+}
+
+resource "aws_iam_instance_profile" "mysql" {
+  name = "${var.project}-${var.environment}-mysql"
+  role = aws_iam_role.mysql.name
 }

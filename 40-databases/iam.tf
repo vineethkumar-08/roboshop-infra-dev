@@ -26,7 +26,12 @@ resource "aws_iam_role" "mysql" {
 }
 
 resource "aws_iam_policy" "mysql" {
-  name        = "test_policy"
+  name        = local.mysql_policy_name
   description = "policy for mysql instance "
   policy      = file("mysql-iam-policy.json") 
   }
+
+  resource "aws_iam_role_policy_attachment" "mysql" {
+  role       = aws_iam_role.mysql.name
+  policy_arn = aws_iam_policy.mysql.arn
+}
