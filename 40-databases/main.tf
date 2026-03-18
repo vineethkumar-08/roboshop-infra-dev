@@ -117,7 +117,3 @@ resource "terraform_data" "bootstrap_mysql" {
   }
 }
 
-resource "aws_iam_instance_profile" "mysql" {
-  name = "${var.project}-${var.environment}-mysql"
-  role = aws_iam_role.mysql.name
-}
