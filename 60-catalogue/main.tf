@@ -38,8 +38,8 @@ resource "terraform_data" "catalogue" {
   }
 }
 
-# action "aws_ec2_stop_instance" "catalogue" {
-#   config {
-#     instance_id = aws_instance.catalogue.id
-#   }
-# }
+action "aws_ec2_stop_instance" "catalogue" {
+  config {
+    instance_id = aws_instance.catalogue.id
+  }
+}
