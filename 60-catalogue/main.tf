@@ -4,6 +4,7 @@ resource "aws_instance" "catalogue" {
   subnet_id = local.private_subnet_ids
   vpc_security_group_ids = [local.catalogue_sg_id]
 
+
   tags = merge(
     {
         Name = "${var.project}-${var.environment}-catalogue"
@@ -34,5 +35,11 @@ resource "terraform_data" "catalogue" {
         "chmod +x /tmp/bootstrap.sh",
         "sudo sh /tmp/bootstrap.sh catalogue ${var.environment}"
     ]
+  }
+}
+
+action "aws_ec2_stop_instance" "catalogue" {
+  config {
+    instance_id = aws_instance.catalogue.id
   }
 }
