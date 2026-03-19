@@ -1,15 +1,15 @@
-resource "aws_lb" "backend-alb" {
+resource "aws_lb" "backend_alb" {
   name               = "${var.project}-${var.environment}"
   internal           = true
   load_balancer_type = "application"
   security_groups    = [local.backend_alb_sg_id]
-  subnets            = local.private_sg_ids
+  subnets            = local.private_subnet_ids
   
   #keeping it false because just to delete it through terraform for practice
   enable_deletion_protection = false
 
   tags = merge(
-    {
+    { 
         Name = "${var.project}-${var.environment}-backend_alb"
     },
     local.common_tags
@@ -26,7 +26,7 @@ resource "aws_lb_listener" "http" {
 
     fixed_response {
       content_type = "text/html"
-      message_body = "<h1>Hi,I am from http  backend-alb</h1>"
+      message_body = "<h1>Hi, I am from HTTP Backend ALB</h1>"
       status_code  = "200"
     }
   }
@@ -36,9 +36,10 @@ resource "aws_lb_listener" "http" {
 
 resource "aws_route53_record" "www" {
   zone_id = var.zone_id
-  name    = "*.backend_alb-${var.environment}.${var.domain_name}"
+  name    = "*.backend-alb-${var.environment}.${var.domain_name}"
   type    = "A"
-#load balancer details
+  
+  # load balancer details
   alias {
     name                   = aws_lb.backend_alb.dns_name
     zone_id                = aws_lb.backend_alb.zone_id
