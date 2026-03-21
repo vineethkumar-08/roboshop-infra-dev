@@ -57,3 +57,119 @@ resource "aws_ami_from_instance" "catalogue" {
    )
     
 }
+
+resource "aws_lb_target_group" "catalogue" {
+  name     = "${var.project}-${var.environment}-catalogue"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = local.vpc_id
+  deregistration_delay  = 60
+  health_check {
+    healthy_threshold = 2
+    interval = 10
+    matcher = "200 -299"
+    path = "/health"
+    port = 8080
+    protocol = http
+    timeout = 2
+    unhealthy_threshold = 3
+
+  }
+} 
+
+
+resource "aws_launch_template" "catalogue" {
+  name = "${var.project}-${var.environment}-catalogue" 
+
+ 
+  image_id = aws_ami_from_instance.catalogue
+
+ # once autoscaling see less traffic. it will terminate the instances
+  instance_initiated_shutdown_behavior = "terminate"
+  instance_type = "t3.micro"
+  vpc_security_group_ids = [local.catalogue_sg_id]
+
+  # each time we apply terraform, this version will be updated as default
+  update_default_version = true
+
+  tag_specifications {
+    resource_type = "instance"
+    # tags for instance create by launch template through auto scaling
+    tags = merge(
+    {
+        Name = "${var.project}-${var.environment}-catalogue"
+    },
+    local.common_tags
+  )
+  
+  }
+   # tags for  voulumes created by instances
+  tag_specifications {
+    resource_type = "volume"
+
+    tags = merge(
+    {
+        Name = "${var.project}-${var.environment}-catalogue"
+    },
+    local.common_tags
+  )
+  }
+   # tags for launch templete
+    tags = merge(
+    {
+        Name = "${var.project}-${var.environment}-catalogue"
+    },
+    local.common_tags 
+    )
+
+}
+
+resource "aws_autoscaling_group" "catalogue" {
+  name                      = "${var.project}-${var.environment}-catalogue"
+  max_size                  = 10
+  min_size                  = 1
+  health_check_grace_period = 120
+  health_check_type         = "ELB"
+  desired_capacity          = 1
+  force_delete              = false
+   launch_template {
+    id      = aws_launch_template.catalogue .id
+    version = "$Latest"
+  }
+  vpc_zone_identifier       = [local.private_subnet_ids]
+
+  instance_maintenance_policy {
+    min_healthy_percentage = 90
+    max_healthy_percentage = 120
+  }
+
+  initial_lifecycle_hook {
+    name                 = "foobar"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 2000
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+
+    notification_metadata = jsonencode({
+      foo = "bar"
+    })
+
+    notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
+    role_arn                = "arn:aws:iam::123456789012:role/S3Access"
+  }
+
+  tag {
+    key                 = "foo"
+    value               = "bar"
+    propagate_at_launch = true
+  }
+
+  timeouts {
+    delete = "15m"
+  }
+
+  tag {
+    key                 = "lorem"
+    value               = "ipsum"
+    propagate_at_launch = false
+  }
+}
