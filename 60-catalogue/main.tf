@@ -70,7 +70,7 @@ resource "aws_lb_target_group" "catalogue" {
     matcher = "200 -299"
     path = "/health"
     port = 8080
-    protocol = http
+    protocol = "http"
     timeout = 2
     unhealthy_threshold = 3
 
@@ -82,7 +82,7 @@ resource "aws_launch_template" "catalogue" {
   name = "${var.project}-${var.environment}-catalogue" 
 
  
-  image_id = aws_ami_from_instance.catalogue
+  image_id = aws_ami_from_instance.catalogue.id
 
  # once autoscaling see less traffic. it will terminate the instances
   instance_initiated_shutdown_behavior = "terminate"
@@ -124,52 +124,34 @@ resource "aws_launch_template" "catalogue" {
 
 }
 
-resource "aws_autoscaling_group" "catalogue" {
-  name                      = "${var.project}-${var.environment}-catalogue"
-  max_size                  = 10
-  min_size                  = 1
-  health_check_grace_period = 120
-  health_check_type         = "ELB"
-  desired_capacity          = 1
-  force_delete              = false
-   launch_template {
-    id      = aws_launch_template.catalogue .id
-    version = "$Latest"
-  }
-  vpc_zone_identifier       = [local.private_subnet_ids]
+# resource "aws_autoscaling_group" "catalogue" {
+#   name                      = "${var.project}-${var.environment}-catalogue"
+#   max_size                  = 10
+#   min_size                  = 1
+#   health_check_grace_period = 120
+#   health_check_type         = "ELB"
+#   desired_capacity          = 1
+#   force_delete              = false
+#    launch_template {
+#     id      = aws_launch_template.catalogue .id
+#     version = "$Latest"
+#   }
+#   vpc_zone_identifier       = [local.private_subnet_ids]
+#   target_group_arns = [aws_lb_target_group.catalogue.arn]
 
-  instance_maintenance_policy {
-    min_healthy_percentage = 90
-    max_healthy_percentage = 120
-  }
+#   tag {
+#     key                 = "Name"
+#     value               = "${var.project}-${var.environment}-catalogue"
+#     propagate_at_launch = true
+#   }
 
-  initial_lifecycle_hook {
-    name                 = "foobar"
-    default_result       = "CONTINUE"
-    heartbeat_timeout    = 2000
-    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+#   timeouts {
+#     delete = "15m"
+#   }
 
-    notification_metadata = jsonencode({
-      foo = "bar"
-    })
-
-    notification_target_arn = "arn:aws:sqs:us-east-1:444455556666:queue1*"
-    role_arn                = "arn:aws:iam::123456789012:role/S3Access"
-  }
-
-  tag {
-    key                 = "foo"
-    value               = "bar"
-    propagate_at_launch = true
-  }
-
-  timeouts {
-    delete = "15m"
-  }
-
-  tag {
-    key                 = "lorem"
-    value               = "ipsum"
-    propagate_at_launch = false
-  }
-}
+#   tag {
+#     key                 = "lorem"
+#     value               = "ipsum"
+#     propagate_at_launch = false
+#   }
+# }
