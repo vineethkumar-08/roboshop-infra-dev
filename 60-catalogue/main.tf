@@ -156,8 +156,8 @@ resource "aws_autoscaling_group" "catalogue" {
     local.common_tags
     )
     content {
-      key                 = each.key
-      value               = each.value
+      key                 = tag.key
+      value               = tag.value
       propagate_at_launch = true
     }
   }
@@ -174,8 +174,9 @@ resource "aws_autoscaling_group" "catalogue" {
 
 resource "aws_autoscaling_policy" "catalogue" {
   name                   = "${var.project}-${var.environment}-catalogue"
-  autoscaling_group_name = aws_autoscaling_group.catallogue.name
+  autoscaling_group_name = aws_autoscaling_group.catalogue.name
   policy_type            = "TargetTrackingScaling"
+  estimated_instance_warmup = 120
 
  target_tracking_configuration {
  predefined_metric_specification {
@@ -188,12 +189,12 @@ resource "aws_autoscaling_policy" "catalogue" {
 
 # this is depends on target group
 resource "aws_lb_listener_rule" "catalogue" {
-  listener_arn = local.backend_lb_listener_arn
+  listener_arn = local.backend_alb_listener_arn
   priority     = 10
 
   action {
     type             = "forward"
-    target_group_arn = aws
+    target_group_arn = aws_lb_target_group.catalogue.arn
   }
 
   condition {
