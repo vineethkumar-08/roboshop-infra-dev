@@ -210,9 +210,10 @@ resource "terraform_data" "catalogue_delete" {
     aws_instance.catalogue.id
   ]
   depends_on = [ aws_autoscaling_policy.catalogue]
+
  # it exicutes in bastion
  provisioner "local-exec" {
-    command = "aws ec2 terminate-instances --${aws_instance.catalogue.id}"
+    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.catalogue.id}"
   }
 }
 
