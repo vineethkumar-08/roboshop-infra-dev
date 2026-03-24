@@ -15,7 +15,7 @@ variable "domain_name" {
   default = "devopspractice08.online"
 }
 
-variable "version" {
+variable "app_version" {
   default = "v3"
 }
 
