@@ -33,7 +33,7 @@ resource "terraform_data" "catalogue" {
   provisioner "remote-exec" {
     inline = [
         "chmod +x /tmp/bootstrap.sh",
-        "sudo sh /tmp/bootstrap.sh catalogue ${var.environment}"
+        "sudo sh /tmp/bootstrap.sh catalogue ${var.environment} ${var.version}"
     ]
   }
 }
@@ -162,13 +162,10 @@ resource "aws_autoscaling_group" "catalogue" {
     }
   }
 
-
   # with in 15 min Auto scaling should be
   timeouts {
     delete = "15m"
   }
-
-  
 }
 
 

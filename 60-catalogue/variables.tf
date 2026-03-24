@@ -14,3 +14,8 @@ variable "zone_id" {
 variable "domain_name" {
   default = "devopspractice08.online"
 }
+
+variable "version" {
+  default = "v3"
+}
+
