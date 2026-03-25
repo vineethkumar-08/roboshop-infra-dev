@@ -2,7 +2,7 @@ variable "component" {
   
   default = {
     # these are  attaching to backend_alb
-    cataologue = {
+    catalogue = {
         rule_priority = 10
     }
     user = {
