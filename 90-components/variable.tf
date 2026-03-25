@@ -1,7 +1,7 @@
 variable "component" {
   
   default = {
-
+    # these are  attaching to backend_alb
     cataologue = {
         rule_priority = 10
     }
@@ -20,7 +20,7 @@ variable "component" {
     payment = {
         rule_priority = 50
     }
-
+    # frontend is attaching to frontend_alb,there is only one component there
     frontend = {
         rule_priority = 10
     }
